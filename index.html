@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#102d36">
+<title>Polyphenol Bio-Composite | NSRC Explorer</title>
+<style>
+:root {
+  --navy:#102d36; --teal:#167c80; --mint:#dff3e9;
+  --sand:#e9d1a4; --paper:#f5f7f4; --ink:#203b40;
+  --muted:#62767a; --white:#fff; --line:#dbe5df;
+}
+* {box-sizing:border-box}
+body {margin:0;background:var(--paper);color:var(--ink);
+  font:16px/1.55 system-ui,-apple-system,sans-serif}
+button,input {font:inherit}
+button {cursor:pointer;touch-action:manipulation}
+header {background:var(--navy);color:white;padding:25px max(18px,calc((100% - 1180px)/2))}
+.eyebrow {color:#9bdcc8;font-size:.76rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+h1 {font-size:clamp(1.8rem,5vw,3.2rem);line-height:1.08;margin:9px 0}
+header p {max-width:720px;color:#d6e7e3;margin-bottom:0}
+nav {display:flex;gap:8px;overflow-x:auto;padding:12px 16px;background:white;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav button,.btn {border:1px solid var(--line);background:white;border-radius:12px;padding:12px 16px;min-height:46px;color:var(--ink);font-weight:700;white-space:nowrap}
+nav button.active,.btn.primary {background:var(--teal);color:white;border-color:var(--teal)}
+main {max-width:1180px;margin:auto;padding:20px 16px 48px}
+section {margin-bottom:24px}
+h2 {font-size:1.45rem;margin:0 0 8px}
+h3 {font-size:1.04rem;margin:0 0 7px}
+p {margin:7px 0}
+.muted {color:var(--muted);font-size:.92rem}
+.layout {display:grid;grid-template-columns:minmax(0,1.7fr) minmax(240px,1fr);gap:16px}
+.card {background:white;border:1px solid var(--line);border-radius:18px;padding:17px;min-width:0}
+.scene {height:390px;background:#eaf2ef;border-radius:14px;overflow:hidden;position:relative;touch-action:pan-y}
+.scene canvas {display:block;width:100%;height:100%;touch-action:none}
+.scene-label {position:absolute;top:10px;left:10px;background:#ffffffed;padding:7px 10px;border-radius:9px;font-size:.8rem;font-weight:800;pointer-events:none}
+.scene-hint {position:absolute;bottom:9px;left:10px;right:10px;text-align:center;background:#ffffffdd;padding:6px;border-radius:8px;font-size:.76rem;pointer-events:none}
+.controls {display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.controls button {flex:1}
+.btn:focus-visible,nav button:focus-visible,input:focus-visible {outline:3px solid #e0a73c;outline-offset:2px}
+.pills {display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.pills button {border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;min-height:44px}
+.pills button.active {background:var(--mint);border-color:var(--teal);font-weight:800}
+.fact {background:#f0f7f3;border-radius:12px;padding:13px;margin-top:10px}
+.warning {border-left:4px solid #c48a28;background:#fff7e7;padding:13px;border-radius:8px}
+.statrow {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.stat {background:#f3f7f4;padding:13px;border-radius:12px}
+.stat strong {display:block;font-size:1.05rem}
+.field {display:flex;flex-direction:column;gap:5px;margin:10px 0}
+input[type=number] {width:100%;padding:12px;border:1px solid #bacbc5;border-radius:10px;min-height:46px}
+.chart {display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.chart-row {display:grid;grid-template-columns:100px minmax(0,1fr) 25px;gap:9px;align-items:center}
+.track {height:27px;background:#edf1ee;border-radius:6px;overflow:hidden}
+.bar {height:100%;width:0;background:#167c80;transition:width .35s;border-radius:6px}
+.bar.control {background:#2868a5}
+.legend {font-size:.83rem;color:var(--muted)}
+.grid3 {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ingredient {text-align:left;border:1px solid var(--line);border-radius:13px;background:white;padding:14px;min-height:92px}
+.ingredient.active {border:2px solid var(--teal);background:#eff8f3}
+.ingredient .emoji {font-size:1.5rem;display:block}
+.ingredient small {color:var(--muted)}
+.scene-selector {display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+footer {background:var(--navy);color:#e4efeb;padding:22px;text-align:center;font-size:.85rem}
+.hidden {display:none!important}
+@media(max-width:760px) {
+ .layout {grid-template-columns:1fr}
+ .scene {height:340px}
+ .grid3 {grid-template-columns:repeat(2,minmax(0,1fr))}
+ main {padding:14px 12px 34px}
+ .card {padding:14px}
+}
+@media(max-width:380px) {
+ .scene {height:290px}
+ .chart-row {grid-template-columns:78px minmax(0,1fr) 22px;gap:6px;font-size:.85rem}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Student research • Environmental engineering</div>
+  <h1>Polyphenol Bio-Composite</h1>
+  <p>An interactive exploration of a waste-derived composite designed for investigation in Qatari urban soils.</p>
+</header>
+
+<nav aria-label="Main navigation">
+  <button class="active" data-page="explore">3D Explorer</button>
+  <button data-page="ingredients">Materials</button>
+  <button data-page="results">Experiment</button>
+  <button data-page="science">Science &amp; Judges</button>
+</nav>
+
+<main>
+<section id="page-explore">
+  <h2>Explore the prototype</h2>
+  <p class="muted">Select a scene, drag to rotate, and pinch to zoom on a touchscreen. The 3D scenes are illustrative models, not measured site geometry.</p>
+  <div class="scene-selector">
+    <button class="btn primary" data-scene="soil">Underground cross-section</button>
+    <button class="btn" data-scene="road">Roadside placement</button>
+    <button class="btn" data-scene="tile">Tile close-up</button>
+  </div>
+  <div class="layout">
+    <div class="card">
+      <div class="scene" id="scene">
+        <div class="scene-label" id="sceneLabel">Soil cross-section</div>
+        <div class="scene-hint">Drag to rotate • Pinch to zoom • Two fingers to move</div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="resetView">Reset view</button>
+        <button class="btn primary" id="waterButton">▶ Show water flow</button>
+      </div>
+      <p class="muted" id="sceneStatus" aria-live="polite">Water animation is paused.</p>
+    </div>
+    <div class="card">
+      <h3>What are you looking at?</h3>
+      <div id="sceneDescription">
+        <p>A simplified underground cross-section shows the road, topsoil, deeper soil and a horizontally positioned composite tile.</p>
+      </div>
+      <div class="fact">
+        <strong>Proposed mechanism</strong>
+        <p class="muted">The composite's plant-derived functional groups may interact with certain dissolved metal ions. This requires testing with actual metals to verify.</p>
+      </div>
+      <div class="warning" style="margin-top:12px">
+        <strong>Model, not proof</strong>
+        <p class="muted">The animated blue water represents a visual tracer. It does not represent measured metal concentrations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="page-ingredients" class="hidden">
+  <h2>Inside the bio-composite tile</h2>
+  <p class="muted">Tap an ingredient to highlight its role in the proposed material.</p>
+  <div class="layout">
+    <div class="card">
+      <div class="scene" id="tileScene">
+        <div class="scene-label">Composite structure</div>
+        <div class="scene-hint">Drag to rotate the tile</div>
+      </div>
+      <div class="pills" id="ingredientButtons">
+        <button class="active" data-material="palm">Date-palm fibres</button>
+        <button data-material="tea">Tea waste</button>
+        <button data-material="coffee">Coffee grounds</button>
+        <button data-material="starch">Cornstarch binder</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3 id="materialTitle">Date-palm fibres</h3>
+      <p id="materialText">Provide a plant-fibre scaffold that helps give the tile structure.</p>
+      <div class="fact">
+        <strong>Planned formulation</strong>
+        <p class="muted">50% processed date-palm fibre, 25% tea waste and 25% coffee grounds by combined dry mass. Cornstarch paste is added separately as a binder.</p>
+      </div>
+      <p class="muted">The illustration is conceptual. It does not show the actual microscopic structure or prove chemical binding.</p>
+    </div>
+  </div>
+</section>
+
+<section id="page-results" class="hidden">
+  <h2>Experimental observations</h2>
+  <p>Your reported observation: the control effluent was dark blue, while the tile-column effluent appeared almost clear.</p>
+  <div class="layout">
+    <div class="card">
+      <h3>Qualitative comparison</h3>
+      <div class="statrow">
+        <div class="stat"><strong>Control</strong><span class="muted">Dark-blue effluent</span><div style="height:35px;background:#174aab;border-radius:7px;margin-top:9px"></div></div>
+        <div class="stat"><strong>Tile column</strong><span class="muted">Almost-clear effluent</span><div style="height:35px;background:#e6f1ef;border:1px solid #c8d9d5;border-radius:7px;margin-top:9px"></div></div>
+      </div>
+      <p class="legend">Colour swatches are illustrative descriptions, not photographs or instrument measurements.</p>
+      <div class="warning">
+        <strong>Interpret carefully</strong>
+        <p class="muted">The observed colour difference may be influenced by filtration, adsorption, dilution, flow differences or other factors. It cannot identify a mechanism by itself.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Optional score graph</h3>
+      <p class="muted">Enter your own recorded visual colour scores. Leave blank if you did not record them.</p>
+      <p class="muted">Scale: 1 = clearest; 5 = darkest blue.</p>
+      <label class="field">Control score (1–5)
+        <input id="controlScore" type="number" min="1" max="5" step="1" placeholder="Enter your score">
+      </label>
+      <label class="field">Tile-column score (1–5)
+        <input id="tileScore" type="number" min="1" max="5" step="1" placeholder="Enter your score">
+      </label>
+      <button class="btn primary" id="plotButton">Update graph</button>
+      <div id="scoreChart" class="chart hidden" aria-live="polite">
+        <div class="chart-row"><span>Control</span><div class="track"><div id="controlBar" class="bar control"></div></div><strong id="controlValue">—</strong></div>
+        <div class="chart-row"><span>Tile column</span><div class="track"><div id="tileBar" class="bar"></div></div><strong id="tileValue">—</strong></div>
+      </div>
+      <p id="graphMessage" class="muted" aria-live="polite">Enter both scores to generate the graph.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Test details to report</h3>
+    <ul>
+      <li>Water volume reported: 200 mL per column.</li>
+      <li>Both columns contained sand; one also contained the composite tile.</li>
+      <li>Record the actual drainage time and collected volume if available.</li>
+      <li>Repeat trials and use a consistent lighting and scoring method.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="page-science" class="hidden">
+  <h2>Science &amp; judge notes</h2>
+  <div class="grid3">
+    <div class="card"><h3>Research question</h3><p class="muted">Can a composite made from locally available organic waste influence the movement of a visible tracer through sandy soil?</p></div>
+    <div class="card"><h3>Potential value</h3><p class="muted">Explores reuse of coffee grounds, tea waste and date-palm residues in a low-cost material concept.</p></div>
+    <div class="card"><h3>Next experiment</h3><p class="muted">Measure actual dissolved metal concentrations before and after treatment using an approved laboratory method.</p></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>What the experiment can and cannot show</h3>
+    <p><strong>It can show:</strong> the visible difference between the collected blue-tracer water from the two setups under the conditions tested.</p>
+    <p><strong>It cannot show:</strong> which chemical mechanism caused the colour difference, whether any heavy metals were removed, or whether the effluent is safe.</p>
+    <p><strong>Important limitation:</strong> without repeated trials and additional controls, differences in flow, contact time, sand packing and dye behaviour may affect the result.</p>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>Suggested answer to judges</h3>
+    <p>“Our initial experiment used blue food colouring as a safe visual tracer to compare two soil columns. We observed that the control effluent was dark blue, while the tile-column effluent appeared almost clear. This is preliminary evidence of a difference in visible tracer behaviour, not proof of heavy-metal immobilisation. Our next step would be to conduct repeated tests and measure actual metal concentrations in an approved laboratory.”</p>
+  </div>
+  <div class="warning" style="margin-top:14px">
+    <strong>Safety and disposal</strong>
+    <p class="muted">Do not use this prototype to treat drinking water. If a future experiment uses actual heavy metals, work only under teacher or laboratory supervision and follow approved waste-disposal procedures. Do not compost a tile exposed to metals unless its safety has been established.</p>
+  </div>
+</section>
+</main>
+<footer>NSRC Bio-Composite Explorer • Educational prototype • 3D scenes are illustrative</footer>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/controls/OrbitControls.js';
+
+const $ = id => document.getElementById(id);
+let activeScene = 'soil', waterOn = false, waterTime = 0;
+const scenes = {};
+const materialInfo = {
+ palm: ['Date-palm fibres','Provide a plant-fibre scaffold that helps give the tile structure.'],
+ tea: ['Spent tea waste','Contains plant-derived compounds, including polyphenols. Their role in metal binding needs experimental verification.'],
+ coffee: ['Spent coffee grounds','Supply a porous organic residue containing various surface functional groups. Their performance depends on preparation and test conditions.'],
+ starch: ['Cornstarch binder','Helps bind the mixture together. It can also influence strength, porosity and water flow.']
+};
+let selectedMaterial = 'palm';
+
+function makeScene(containerId, kind) {
+ const host = $(containerId);
+ const scene = new THREE.Scene();
+ scene.background = new THREE.Color('#eaf2ef');
+ const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+ camera.position.set(8, 6, 9);
+ const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+ renderer.shadowMap.enabled = true;
+ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+ renderer.outputColorSpace = THREE.SRGBColorSpace;
+ host.appendChild(renderer.domElement);
+ const controls = new OrbitControls(camera, renderer.domElement);
+ controls.enableDamping = true;
+ controls.dampingFactor = .07;
+ controls.enablePan = true;
+ controls.minDistance = 4;
+ controls.maxDistance = 22;
+ controls.target.set(0,0,0);
+ scene.add(new THREE.HemisphereLight(0xffffff,0x8d9e8c,2.1));
+ const light = new THREE.DirectionalLight(0xffffff,2.5);
+ light.position.set(5,10,7); light.castShadow = true; scene.add(light);
+ const root = new THREE.Group(); scene.add(root);
+ const animated = [];
+ const mat = (color, roughness=.9) => new THREE.MeshStandardMaterial({color,roughness});
+ function cube(parent,w,h,d,color,x,y,z,opts={}) {
+   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));
+   mesh.position.set(x,y,z);
+   mesh.castShadow=true; mesh.receiveShadow=true;
+   parent.add(mesh); return mesh;
+ }
+ function label(text,x,y,z,color='#203b40') {
+   const canvas=document.createElement('canvas');
+   canvas.width=512;canvas.height=96;
+   const ctx=canvas.getContext('2d');
+   ctx.fillStyle='#ffffff';ctx.fillRect(0,0,512,96);
+   ctx.fillStyle=color;ctx.font='bold 32px system-ui';ctx.textAlign='center';
+   ctx.fillText(text,256,60,480);
+   const tex=new THREE.CanvasTexture(canvas);
+   const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:false,depthTest:false}));
+   sprite.scale.set(3.3,.62,1);sprite.position.set(x,y,z);root.add(sprite);
+   return sprite;
+ }
+ const roadY=2.25;
+ if(kind==='soil'||kind==='road'){
+   cube(root,13,.35,8,'#40494c',0,roadY,0);
+   for(let x=-5.5;x<=5.5;x+=2.2) cube(root,.85,.025,.07,'#f5e5a6',x,roadY+.19,0);
+   cube(root,13,1.2,8,'#bd9864',0,1.45,0);
+   cube(root,13,1.35,8,'#d7b784',0,.18,0);
+   cube(root,13,1.4,8,'#b68c60',0,-1.2,0);
+   cube(root,13,.15,8,'#7a9a73',0,2.52,0);
+   // Roadside grass tufts
+   for(let i=0;i<22;i++){
+     const x=-5.8+(i%11)*1.15,z=(i<11?-3.2:3.2);
+     const tuft=cube(root,.055,.45,.055,'#57845a',x,2.77,z);
+     tuft.rotation.z=(i%2?-.22:.22);
+   }
+   if(kind==='road'){
+     // roadside kerb and visible tile placement
+     cube(root,.35,.35,8,'#e2e2d8',-6.25,2.15,0);
+     cube(root,2.7,.18,1.55,'#b8a078',-3.7,.9,0);
+     const tile=cube(root,2.55,.20,1.35,'#9a7953',-3.7,.71,0);
+     tile.material=mat('#98714a');
+     label('BIO-COMPOSITE TILE',-3.5,1.3,0);
+     label('ROAD',1.5,3.05,0);
+   } else {
+     label('ROAD SURFACE',0,3.05,0);
+     label('TOPSOIL',4,1.45,1.1);
+     label('SUBSOIL',4,.15,1.1);
+     label('DEEPER SOIL',4,-1.35,1.1);
+     cube(root,3.5,.22,1.5,'#8d704d',0,.76,0);
+     const tile=cube(root,3.45,.20,1.45,'#a47a4c',0,.54,0);
+     tile.userData.isTile=true;
+     label('BIO-COMPOSITE TILE',0,1.03,0);
+   }
+ } else {
+   // Porous-looking tile block with illustrative embedded fibres and particles
+   const base=cube(root,4.8,.48,3.1,'#aa8356',0,0,0);
+   base.material=mat('#aa8356');
+   for(let i=0;i<80;i++){
+     const x=(Math.random()-.5)*4.45,y=.26+(Math.random()-.5)*.18,z=(Math.random()-.5)*2.75;
+     const colors=['#6c4b32','#40372e','#d7c39b','#6b7755'];
+     const sphere=new THREE.Mesh(new THREE.SphereGeometry(.045+Math.random()*.045,7,6),mat(colors[i%colors.length]));
+     sphere.position.set(x,y,z);root.add(sphere);
+   }
+   const fibers=[];
+   for(let i=0;i<18;i++){
+     const points=[new THREE.Vector3(-2.1+Math.random()*4,.28,-1.3+Math.random()*2.6),
+                   new THREE.Vector3(-2.1+Math.random()*4,.30,-1.3+Math.random()*2.6)];
+     const geo=new THREE.BufferGeometry().setFromPoints(points);
+     const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:'#dfc18a'}));
+     root.add(line);fibers.push(line);
+   }
+   label('PLANT-FIBRE MATRIX',0,1.15,0);
+   label('TEA + COFFEE',0,-.55,1.7);
+   scenes[containerId].fibers=fibers;
+ }
+ // Animated blue tracer particles: illustrative flow only
+ for(let i=0;i<12;i++){
+   const drop=new THREE.Mesh(new THREE.SphereGeometry(.085,12,10),mat('#236cda',.25));
+   drop.visible=false;root.add(drop);animated.push(drop);
+ }
+ function resize(){
+   const w=Math.max(host.clientWidth,1),h=Math.max(host.clientHeight,1);
+   renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+ }
+ const observer=new ResizeObserver(resize);observer.observe(host);resize();
+ const record={scene,camera,renderer,controls,root,animated,kind,host};
+ scenes[containerId]=record;
+ return record;
+}
+const main3d=makeScene('scene','soil');
+const tile3d=makeScene('tileScene','tile');
+
+function switchScene(kind){
+ activeScene=kind;
+ const old=scenes.scene;
+ old.root.clear(); old.animated.length=0;
+ old.kind=kind;
+ // Rebuild the scene objects without duplicating the canvas
+ const host=$('scene');
+ old.scene.background=new THREE.Color('#eaf2ef');
+ // rebuild using a temporary fresh scene's contents, then transfer them
+ const temp=buildSceneContents(old,kind);
+ $('sceneLabel').textContent=({soil:'Soil cross-section',road:'Roadside placement',tile:'Tile close-up'})[kind];
+ $('sceneDescription').innerHTML=({
+ soil:'<p>A simplified underground cross-section shows the road, topsoil, deeper soil and a horizontally positioned composite tile.</p>',
+ road:'<p>A conceptual roadside placement shows where a tile might be positioned. It does not establish the correct real-world installation depth.</p>',
+ tile:'<p>The tile close-up illustrates a composite made from plant fibres, tea waste, coffee grounds and a starch binder. Its texture is not a microscopic measurement.</p>'
+ })[kind];
+ document.querySelectorAll('[data-scene]').forEach(b=>b.classList.toggle('active',b.dataset.scene===kind));
+ document.querySelectorAll('[data-scene]').forEach(b=>b.classList.toggle('primary',b.dataset.scene===kind));
+ document.querySelectorAll('[data-scene]').forEach(b=>b.style.background=b.dataset.scene===kind?'#167c80':'white');
+ document.querySelectorAll('[data-scene]').forEach(b=>b.style.color=b.dataset.scene===kind?'white':'#203b40');
+ old.camera.position.set(8,6,9);old.controls.target.set(0,0,0);old.controls.update();
+ waterOn=false;waterTime=0;updateWaterButton();
+}
+function buildSceneContents(rec,kind){
+ const root=rec.root,animated=rec.animated;
+ const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.9});
+ function cube(w,h,d,c,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;root.add(m);return m}
+ function label(text,x,y,z){
+   const c=document.createElement('canvas');c.width=512;c.height=96;
+   const ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,512,96);
+   ctx.fillStyle='#203b40';ctx.font='bold 32px system-ui';ctx.textAlign='center';ctx.fillText(text,256,60,480);
+   const t=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false}));
+   s.scale.set(3.3,.62,1);s.position.set(x,y,z);root.add(s);
+ }
+ if(kind==='tile'){
+   cube(4.8,.48,3.1,'#aa8356',0,0,0);
+   for(let i=0;i<65;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(.05+Math.random()*.05,7,6),mat(['#6c4b32','#40372e','#d7c39b','#6b7755'][i%4]));m.position.set((Math.random()-.5)*4.4,.26,(Math.random()-.5)*2.7);root.add(m)}
+   label('BIO-COMPOSITE TILE',0,.75,0);
+ } else {
+   cube(13,.35,8,'#40494c',0,2.25,0);cube(13,1.2,8,'#bd9864',0,1.45,0);cube(13,1.35,8,'#d7b784',0,.18,0);cube(13,1.4,8,'#b68c60',0,-1.2,0);cube(13,.15,8,'#7a9a73',0,2.52,0);
+   if(kind==='road'){cube(.35,.35,8,'#e2e2d8',-6.25,2.15,0);cube(2.7,.18,1.55,'#b8a078',-3.7,.9,0);cube(2.55,.2,1.35,'#98714a',-3.7,.71,0);label('BIO-COMPOSITE TILE',-3.5,1.3,0);label('ROAD',1.5,3.05,0)}
+   else {label('ROAD SURFACE',0,3.05,0);label('TOPSOIL',4,1.45,1.1);label('SUBSOIL',4,.15,1.1);label('DEEPER SOIL',4,-1.35,1.1);cube(3.5,.22,1.5,'#8d704d',0,.76,0);cube(3.45,.2,1.45,'#a47a4c',0,.54,0);label('BIO-COMPOSITE TILE',0,1.03,0)}
+ }
+ for(let i=0;i<12;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(.085,12,10),mat('#236cda'));m.visible=false;root.add(m);animated.push(m)}
+}
+document.querySelectorAll('[data-scene]').forEach(b=>b.addEventListener('click',()=>switchScene(b.dataset.scene)));
+$('resetView').addEventListener('click',()=>{
+ const s=scenes.scene;s.camera.position.set(8,6,9);s.controls.target.set(0,0,0);s.controls.update();
+});
+function updateWaterButton(){$('waterButton').textContent=waterOn?'❚❚ Pause water flow':'▶ Show water flow';$('sceneStatus').textContent=waterOn?'Illustrative water animation is running.':'Water animation is paused.'}
+$('waterButton').addEventListener('click',()=>{waterOn=!waterOn;updateWaterButton()});
+
+document.querySelectorAll('[data-material]').forEach(b=>b.addEventListener('click',()=>{
+ selectedMaterial=b.dataset.material;
+ document.querySelectorAll('[data-material]').forEach(x=>x.classList.toggle('active',x===b));
+ $('materialTitle').textContent=materialInfo[selectedMaterial][0];
+ $('materialText').textContent=materialInfo[selectedMaterial][1];
+}));
+
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));
+ document.querySelectorAll('main section[id^="page-"]').forEach(s=>s.classList.add('hidden'));
+ $('page-'+b.dataset.page).classList.remove('hidden');
+ window.scrollTo({top:0,behavior:'smooth'});
+ // Trigger resize for scenes that were previously hidden
+ setTimeout(()=>Object.values(scenes).forEach(s=>{
+   const w=s.host.clientWidth,h=s.host.clientHeight;if(w&&h){s.renderer.setSize(w,h,false);s.camera.aspect=w/h;s.camera.updateProjectionMatrix()}
+ }),100);
+}));
+
+$('plotButton').addEventListener('click',()=>{
+ const c=$('controlScore').value,t=$('tileScore').value;
+ const valid=v=>v!==''&&Number.isInteger(Number(v))&&Number(v)>=1&&Number(v)<=5;
+ if(!valid(c)||!valid(t)){
+   $('graphMessage').textContent='Enter both whole-number scores from 1 to 5. No scores are assumed.';
+   $('scoreChart').classList.add('hidden');return;
+ }
+ $('scoreChart').classList.remove('hidden');
+ $('controlBar').style.width=(Number(c)/5*100)+'%';
+ $('tileBar').style.width=(Number(t)/5*100)+'%';
+ $('controlValue').textContent=c;$('tileValue').textContent=t;
+ $('graphMessage').textContent='Scores entered by the user. Scale: 1 = clearest; 5 = darkest blue.';
+});
+
+function animate(){
+ requestAnimationFrame(animate);
+ for(const rec of Object.values(scenes)){
+   if(rec.kind!=='tile'&&rec.animated.length){
+     rec.animated.forEach((drop,i)=>{
+       drop.visible=waterOn;
+       if(waterOn){
+         const t=(waterTime+i*.19)%1;
+         drop.position.set(-3.2+t*6,2.05-t*3.4,Math.sin(t*9+i)*.12);
+       }
+     });
+   }
+   rec.controls.update();rec.renderer.render(rec.scene,rec.camera);
+ }
+ if(waterOn)waterTime=(waterTime+.0035)%1;
+}
+animate();
+</script>
+</body>
+</html>
